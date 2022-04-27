@@ -17,4 +17,4 @@ mongoose.connect('mongodb://localhost:27017/cake_shop')
 app.get('/', (req, res) => {
     res.send('Hello World')})
   
-app.use(cakeRoutes)
+app.use('/cakes', cakeRoutes)

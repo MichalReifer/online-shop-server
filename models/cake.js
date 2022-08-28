@@ -4,15 +4,23 @@ const Schema = mongoose.Schema
 const cakeSchema = new Schema({
     title: {
         type: String,
-        required: false
+        required: true
     }, 
+    category: {
+        type: String,
+        required: true
+    },
     price: {
         type: Number,
-        required: false
+        required: true
     },
     description: {
         type: String,
         requires: false
+    },
+    image: {
+        type: Buffer,
+        required: false
     }
 }, {timestamps: true})
 

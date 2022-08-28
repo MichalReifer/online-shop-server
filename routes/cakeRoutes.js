@@ -8,7 +8,35 @@ router.get('/', (req, res) => {
         .then(result => res.send(result))
         .catch(err => console.log(err))
 })
-  
+
+router.get('/sort-search-limit', (req, res) => {
+    const { page, limit, value } = req.query
+    console.log(req.url)
+    const searchRegExp = new RegExp(value, 'i');
+    Cake.find(
+            {'title': searchRegExp}, 
+            // {image:0} // no image
+        )
+        .sort('title')
+        .skip(page*limit)
+        .limit(limit)
+        .then(result => res.send(result))
+        .catch(err => console.log(err))
+})
+
+router.get('/by-category/:category', (req, res) => {
+    const category = req.params.category
+    Cake.find({category}, {image: 0})
+        .then(result => res.send(result))
+        .catch(err => console.log(err))
+})
+
+router.get('/all-categories', (req,res)=>{
+    Cake.distinct('category')
+        .then(result=> res.send(result))
+        .catch(err=>console.log(err))
+})
+
 router.post('/', (req, res) => {
     const cake = new Cake(req.body)
     // console.log(req.body)

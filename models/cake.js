@@ -6,6 +6,10 @@ const cakeSchema = new Schema({
         type: String,
         required: true
     }, 
+    cakeId: {
+        type: String,
+        required: true
+    },
     category: {
         type: String,
         required: true
@@ -19,7 +23,8 @@ const cakeSchema = new Schema({
         requires: false
     },
     image: {
-        type: Buffer,
+        data: Buffer,
+        contentType: String,
         required: false
     }
 }, {timestamps: true})

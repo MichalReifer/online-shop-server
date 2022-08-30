@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
 
 router.get('/sort-search-limit', (req, res) => {
     const { page, limit, value } = req.query
-    console.log(req.url)
+    // console.log(req.url)
     const searchRegExp = new RegExp(value, 'i');
     Cake.find(
             {'title': searchRegExp}, 
@@ -20,6 +20,15 @@ router.get('/sort-search-limit', (req, res) => {
         .sort('title')
         .skip(page*limit)
         .limit(limit)
+        .then(result => res.send(result))
+        .catch(err => console.log(err))
+})
+
+router.get('/by-cakeid/:cakeid', (req, res) => {
+    const cakeId = req.params.cakeid
+    Cake.findOne({"cakeId": cakeId}, 
+        // {image: 0} // no image
+        )
         .then(result => res.send(result))
         .catch(err => console.log(err))
 })

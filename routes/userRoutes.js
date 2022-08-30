@@ -18,16 +18,30 @@ router.post('/', (req, res) => {
         .catch(err=>console.log(err))
 })
 
-router.get('/:id', (req, res) => {
+router.get('/by-id/:id', (req, res) => {
     const id = req.params.id
     User.findById(id)
         .then(result => res.send(result))
         .catch(err => console.log(err))
 })
 
-router.delete('/:id', (req, res) => {
+router.get('/by-email/:email', (req, res) => {
+    const email = req.params.email
+    User.find({email})
+        .then(result => res.send(result))
+        .catch(err => console.log(err))
+})
+
+router.delete('/by-id/:id', (req, res) => {
     const id = req.params.id
     User.findByIdAndDelete(id)
+        .then(result => res.send(result))
+        .catch(err => console.log(err))
+})
+
+router.delete('/by-email/:email', (req, res) => {
+    const email = req.params.email
+    User.findOneAndDelete({email})
         .then(result => res.send(result))
         .catch(err => console.log(err))
 })

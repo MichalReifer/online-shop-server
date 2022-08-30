@@ -2,18 +2,24 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
-    title: {
+    name: {
         type: String,
-        required: false
+        required: true
     }, 
-    price: {
-        type: Number,
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true
+    },
+    admin:{
+        type: Boolean,
+        required: true
+    },
+    address:{
+        type: String,
         required: false
     },
-    description: {
-        type: String,
-        requires: false
-    }
 }, {timestamps: true})
 
 const User = mongoose.model('User', userSchema)

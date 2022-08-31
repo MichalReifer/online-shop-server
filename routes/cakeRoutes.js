@@ -6,7 +6,7 @@ const Cake = require('../models/cake')
 router.get('/', (req, res) => {
     Cake.find()
         .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.get('/sort-search-limit', (req, res) => {
@@ -21,29 +21,32 @@ router.get('/sort-search-limit', (req, res) => {
         .skip(page*limit)
         .limit(limit)
         .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.get('/by-cakeid/:cakeid', (req, res) => {
     const cakeId = req.params.cakeid
-    Cake.findOne({"cakeId": cakeId}, 
+    Cake.findOne({cakeId}, 
         // {image: 0} // no image
         )
-        .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .then(result => {
+            if (!result) throw new Error('no such cake')
+            else res.send(result)
+        })
+        .catch(err => res.status(404).json({error: err.message}))
 })
 
 router.get('/by-category/:category', (req, res) => {
     const category = req.params.category
     Cake.find({category}, {image: 0})
         .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.get('/all-categories', (req,res)=>{
     Cake.distinct('category')
         .then(result=> res.send(result))
-        .catch(err=>console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.post('/', (req, res) => {
@@ -52,29 +55,38 @@ router.post('/', (req, res) => {
     // console.log(cake)
     cake.save()
         .then(result=>{res.send(result)})
-        .catch(err=>console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.get('/:id', (req, res) => {
     const id = req.params.id
-    Cake.findById(id)
-        .then(result => res.send(result))
-        .catch(err => console.log(err))
+    Cake.findById(id, {image:0} )
+        .then(result => {
+            if (!result) throw new Error('no such cake')
+            else res.send(result)
+        })
+        .catch(err => res.status(404).json({error: err.message}))
 })
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id
     Cake.findByIdAndDelete(id)
-        .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .then(result => {
+            if (!result) throw new Error('no such cake')
+            else res.send(result)
+        })
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 router.patch('/:id', (req, res) => {
     const id = req.params.id
     const updates = req.body
     Cake.findByIdAndUpdate(id, updates, {new: true})
-        .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .then(result => {
+            if (!result) throw new Error('no such cake')
+            else res.send(result)
+        })
+        .catch(err => res.status(400).json({error: err.message}))
 })
 
 module.exports = router;

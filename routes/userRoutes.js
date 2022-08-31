@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const {
+    signupUser,
     getAllUsers,
     getUserById,
     getUserByEmail,
@@ -9,6 +10,8 @@ const {
     updateUserById,
 } = require('../controllers/userController')
 
+
+router.post('/signup', signupUser)
 
 router.get('/', getAllUsers)
   

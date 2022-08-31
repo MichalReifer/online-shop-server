@@ -1,10 +1,16 @@
 const User = require('../models/user')
 
 
+const signupUser = (req, res) => {
+  User.signup(req.body)
+    .then(result=>res.json(result))
+    .catch(err => res.status(400).json({error: err.message}) )
+}
+
 const getAllUsers = (req, res) => {
     User.find()
         .then(result => res.send(result))
-        .catch(err => console.log(err))
+        .catch(err => res.status(400).json({error: err.message}))
 }
   
 const addNewUser =  (req, res) => {
@@ -56,6 +62,7 @@ const updateUserById = (req, res) => {
 }
 
 module.exports = {
+  signupUser,
   getAllUsers,
   getUserById,
   getUserByEmail,

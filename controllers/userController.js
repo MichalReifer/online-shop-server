@@ -1,10 +1,30 @@
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+const createToken = _id => {
+    return jwt.sign({_id}, process.env.SECRET, { expiresIn: '3d'})
+}
 
 
 const signupUser = (req, res) => {
-  User.signup(req.body)
-    .then(result=>res.json(result))
-    .catch(err => res.status(400).json({error: err.message}) )
+    User.signup(req.body)
+        .then(newUser=>{
+            const {name, email, admin, _id} = newUser
+            const token = createToken(_id)
+            res.send({_id, name, email, admin, token})
+        })
+        .catch(err => res.status(400).json({error: err.message}) )
+}
+
+const loginUser = (req, res) => {
+    const {email, password} = req.body
+    User.login(email, password)
+        .then(user=>{
+            const {name, email, admin, _id} = user
+            const token = createToken(_id)
+            res.send({_id, name, email, admin, token})
+        })
+        .catch(err => res.status(400).json({error: err.message}) )
 }
 
 const getAllUsers = (req, res) => {
@@ -63,6 +83,7 @@ const updateUserById = (req, res) => {
 
 module.exports = {
   signupUser,
+  loginUser,
   getAllUsers,
   getUserById,
   getUserByEmail,

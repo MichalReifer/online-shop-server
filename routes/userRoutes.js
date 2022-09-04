@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const {
     signupUser,
+    loginUser,
     getAllUsers,
     getUserById,
     getUserByEmail,
@@ -12,6 +13,8 @@ const {
 
 
 router.post('/signup', signupUser)
+
+router.post('/login', loginUser)
 
 router.get('/', getAllUsers)
   

@@ -32,23 +32,37 @@ const userSchema = new Schema({
 
 
 userSchema.statics.signup = async function(newUser) {
-
-    if (!newUser.email || !newUser.password)
+    const {email, password} = newUser
+    
+    if (!email || !password)
         throw Error('All fields must be filled')
 
-    if (!validator.isEmail(newUser.email))
+    if (!validator.isEmail(email))
         throw Error('Email is not valid')
 
-    if (newUser.password.length < 6 )
+    if (password.length < 6 )
         throw Error('Password must be at least 6 characters long')
 
-    return this.findOne({email: newUser.email})
-        .then(exists => {
-            if (exists) throw Error('Email already in use')
-            else return bcrypt.genSalt(10)
-        })
-        .then(salt => bcrypt.hash(newUser.password, salt))
-        .then(hash => this.create({ ...newUser, password: hash }))
+    return this.findOne({email})
+            .then(exists => {
+                if (exists) 
+                    throw Error('Email already in use')})
+            .then(() => bcrypt.genSalt(10))
+            .then(salt => bcrypt.hash(password, salt))
+            .then(hash => this.create({ ...newUser, password: hash }))
+}
+
+userSchema.statics.login = async function(email, password) {
+    if (!email || !password)
+        throw Error('All fields must be filled')
+
+    const user = await this.findOne({email})
+    if (!user) throw Error('Incorrect email')
+    
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) throw Error('Incorrect password')
+
+    return user 
 }
 
 const User = mongoose.model('User', userSchema)

@@ -1,8 +1,11 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors');
+
 const cakeRoutes = require('./routes/cakeRoutes')
 const userRoutes = require('./routes/userRoutes')
+const orderRoutes = require('./routes/orderRoutes')
+
 require('./editCollections/editCakes')
 require('dotenv').config()
 
@@ -21,3 +24,4 @@ app.use((req, res, next)=>{
 })
 app.use('/cakes', cakeRoutes)
 app.use('/users', userRoutes)
+app.use('/orders', orderRoutes)

@@ -1,16 +1,18 @@
 const express = require('express')
 const router = express.Router()
 const {
+    validateToken,
     signupUser,
     loginUser,
     getAllUsers,
     getUserById,
     getUserByEmail,
-    addNewUser,
     deleteUserById,
     updateUserById,
 } = require('../controllers/userController')
 
+
+router.post('/validate-token', validateToken)
 
 router.post('/signup', signupUser)
 
@@ -18,8 +20,6 @@ router.post('/login', loginUser)
 
 router.get('/', getAllUsers)
   
-router.post('/', addNewUser)
-
 router.get('/by-id/:id', getUserById)
 
 router.get('/by-email/:email', getUserByEmail)

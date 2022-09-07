@@ -1,10 +1,23 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
+const { default: mongoose } = require('mongoose')
 
 const createToken = _id => {
     return jwt.sign({_id}, process.env.SECRET, { expiresIn: '3d'})
 }
 
+const validateToken = (req, res) => {
+    const bearerHeader = req.headers['authorization'];
+    try {
+        const token = bearerHeader.split(' ')[1]
+        const decoded = jwt.verify(token, process.env.SECRET)
+        User.findById(decoded._id, {password:0})
+            .then(user=>res.send(user))   
+    } 
+    catch {
+        res.status(400).json({error: 'invalid token'})
+    }
+}
 
 const signupUser = (req, res) => {
     User.signup(req.body)
@@ -32,17 +45,14 @@ const getAllUsers = (req, res) => {
         .then(result => res.send(result))
         .catch(err => res.status(400).json({error: err.message}))
 }
-  
-const addNewUser =  (req, res) => {
-    const user = new User(req.body)
-    user.save()
-        .then(result=>{res.send(result)})
-        .catch(err => res.status(400).json({error: err.message}))
-}
 
 const getUserById = (req, res) => {
     const id = req.params.id
-    User.findById(id)
+
+    if (!mongoose.isValidObjectId(id))
+        return res.status(404).json({error: 'user id is invalid'})
+
+    User.findById(id, {password:0})
         .then(result => {
             if (!result) throw new Error('no such user')
             else res.send(result)
@@ -82,12 +92,12 @@ const updateUserById = (req, res) => {
 }
 
 module.exports = {
+  validateToken,
   signupUser,
   loginUser,
   getAllUsers,
   getUserById,
   getUserByEmail,
-  addNewUser,
   deleteUserById,
   updateUserById,
 }

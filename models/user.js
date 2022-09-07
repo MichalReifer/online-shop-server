@@ -49,7 +49,7 @@ userSchema.statics.signup = async function(newUser) {
                     throw Error('Email already in use')})
             .then(() => bcrypt.genSalt(10))
             .then(salt => bcrypt.hash(password, salt))
-            .then(hash => this.create({ ...newUser, password: hash }))
+            .then(hash => this.create({ ...newUser, admin: false, password: hash }))
 }
 
 userSchema.statics.login = async function(email, password) {

@@ -41,52 +41,79 @@ const loginUser = (req, res) => {
 }
 
 const getAllUsers = (req, res) => {
+    const authUser = req.user
+    if(!authUser.admin)
+        return res.status(400).json({error: 'you are not authorized to access this data'})   
+
     User.find()
-        .then(result => res.send(result))
+        .then(users=>res.send(users))
         .catch(err => res.status(400).json({error: err.message}))
 }
 
 const getUserById = (req, res) => {
     const id = req.params.id
-
+    const authUser = req.user
+    
     if (!mongoose.isValidObjectId(id))
         return res.status(404).json({error: 'user id is invalid'})
+    if(!authUser.admin && !authUser._id.equals(id))
+        return res.status(400).json({error: 'you are not authorized to access this data'})   
 
     User.findById(id, {password:0})
-        .then(result => {
-            if (!result) throw new Error('no such user')
-            else res.send(result)
+        .then(user=>{
+            if (user) return res.send(user)
+            else throw Error('no such user')
         })
         .catch(err => res.status(400).json({error: err.message}))
 }
 
 const getUserByEmail = (req, res) => {
     const email = req.params.email
+    const authUser = req.user
+
     User.findOne({email})
-        .then(result => {
-            if (!result) throw new Error('no such user')
-            else res.send(result)
+        .then(user=>{
+            if (!user) 
+                throw Error('no such user')
+            else if(!authUser.admin && !authUser._id.equals(user._id))
+                throw Error('you are not authorized to access this data')       
+            else 
+                return res.send(user)
         })
         .catch(err => res.status(400).json({error: err.message}))
 }
 
 const deleteUserById = (req, res) => {
     const id = req.params.id
+    const authUser = req.user
+
+    if (!mongoose.isValidObjectId(id))
+        return res.status(404).json({error: 'user id is invalid'})
+    if(!authUser.admin && !authUser._id.equals(id))
+        return res.status(400).json({error: 'you are not authorized to perform this action'})   
+
     User.findByIdAndDelete(id)
-        .then(result => {
-            if (!result) throw new Error('no such user')
-            else res.send(result)
+        .then(user=>{
+            if (user) return res.send(user)
+            else throw Error('no such user')
         })
         .catch(err => res.status(400).json({error: err.message}))
 }
 
 const updateUserById = (req, res) => {
-    const id = req.params.id
     const updates = req.body
+    const id = req.params.id
+    const authUser = req.user
+
+    if (!mongoose.isValidObjectId(id))
+        return res.status(404).json({error: 'user id is invalid'})
+    if(!authUser.admin && !authUser._id.equals(id))
+        return res.status(400).json({error: 'you are not authorized to perform this action'})   
+
     User.findByIdAndUpdate(id, updates, {new: true})
-        .then(result => {
-            if (!result) throw new Error('no such user')
-            else res.send(result)
+        .then(user=>{
+            if (user) return res.send(user)
+            else throw Error('no such user')
         })
         .catch(err => res.status(400).json({error: err.message}))
 }

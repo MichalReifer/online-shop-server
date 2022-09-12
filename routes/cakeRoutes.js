@@ -11,6 +11,7 @@ const {
     deleteCakeById
 } = require('../controllers/cakeController') 
 
+const requireAuth = require('../middleware/requireAuth')
 
 router.get('/sort-search-limit', getAllCakes)
 
@@ -20,12 +21,12 @@ router.get('/by-category/:category', getCakesByCategory)
 
 router.get('/all-categories', getAllCategories)
 
-router.post('/', addNewCake)
-
 router.get('/:id', getCakeById)
 
-router.delete('/:id', deleteCakeById)
+router.post('/', requireAuth, addNewCake)
 
-router.patch('/:id', updateCakeById)
+router.delete('/:id', requireAuth, deleteCakeById)
+
+router.patch('/:id', requireAuth, updateCakeById)
 
 module.exports = router;

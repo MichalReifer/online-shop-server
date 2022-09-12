@@ -1,4 +1,5 @@
 const Cake = require('../models/cake')
+const fs = require('fs')
 
 
 const getAllCakes = (req, res) => {
@@ -11,70 +12,84 @@ const getAllCakes = (req, res) => {
     .sort('title')
     .skip(page*limit)
     .limit(limit)
-    .then(result => res.send(result))
+    .then(cakes => res.send(cakes))
     .catch(err => res.status(400).json({error: err.message}))
 }
 
 const getCakeByCakeId = (req, res) => {
   const cakeId = req.params.cakeid
-  Cake.findOne({cakeId}, 
-      // {image: 0} // no image
-    )
-    .then(result => {
-      if (!result) throw new Error('no such cake')
-      else res.send(result)
+  Cake.findOne({cakeId})
+    .then(cake => {
+      if (!cake) throw new Error('no such cake')
+      else res.send(cake)
     })
     .catch(err => res.status(404).json({error: err.message}))
 }
 
 const getCakesByCategory = (req, res) => {
   const category = req.params.category
-  Cake.find({category}, 
-      // {image: 0} // no image
-    )
-    .then(result => res.send(result))
+  Cake.find({category})
+    .then(cakes => res.send(cakes))
     .catch(err => res.status(400).json({error: err.message}))
 }
 
 const getAllCategories = (req,res)=>{
   Cake.distinct('category')
-    .then(result=> res.send(result))
+    .then(categories=> res.send(categories))
     .catch(err => res.status(400).json({error: err.message}))
 }
 
 const addNewCake = (req, res) => {
+  const authUser = req.user
+  if (!authUser.admin)
+    return res.status(400).json({error: 'you are not authorized to perform this action'})   
+
   const cake = new Cake(req.body)
   cake.save()
-    .then(result=>{res.send(result)})
+    .then(cake => res.send(cake))
     .catch(err => res.status(400).json({error: err.message}))
 }
 
 const getCakeById = (req, res) => {
   const id = req.params.id
   Cake.findById(id)
-    .then(result => {
-      if (!result) throw new Error('no such cake')
-      else res.send(result)
+    .then(cake => {
+      if (cake) res.send(cake)
+      else throw new Error('no such cake')
     })
     .catch(err => res.status(404).json({error: err.message}))
 }
 
 const deleteCakeById = (req, res) => {
+  const authUser = req.user
   const id = req.params.id
+
+  if (!authUser.admin)
+    return res.status(400).json({error: 'you are not authorized to perform this action'})   
+  if (!mongoose.isValidObjectId(id))
+    return res.status(404).json({error: 'cake id is invalid'})
+
   Cake.findByIdAndDelete(id)
-    .then(result => {
-      if (!result) throw new Error('no such cake')
-      else res.send(result)
+    .then(cake => {
+      if (cake) res.send(cake)
+      else throw new Error('no such cake')
     })
     .catch(err => res.status(400).json({error: err.message}))
 }
 
 const updateCakeById = (req, res) => {
+  const authUser = req.user
   const id = req.params.id
+
+  if (!authUser.admin)
+    return res.status(400).json({error: 'you are not authorized to perform this action'})   
+  if (!mongoose.isValidObjectId(id))
+    return res.status(404).json({error: 'cake id is invalid'})
+
   Cake.findByIdAndUpdate(id, req.body, {new: true})
-    .then(result => {
-      if (!result) throw new Error('no such cake')
-      else res.send(result)
+    .then(cake => {
+      if (cake) res.send(cake)
+      else throw new Error('no such cake')
     })
     .catch(err => res.status(400).json({error: err.message}))
 }

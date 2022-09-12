@@ -9,6 +9,8 @@ const {
   updateOrderById
 } = require('../controllers/orderController') 
 
+const requireAuth = require('../middleware/requireAuth')
+router.use(requireAuth)
 
 router.post('/', addNewOrder)
 

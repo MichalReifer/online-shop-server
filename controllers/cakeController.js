@@ -16,6 +16,18 @@ const getAllCakes = (req, res) => {
     .catch(err => res.status(400).json({error: err.message}))
 }
 
+const getCakesByCakeIdList = async (req, res) => {
+  const cakeIdList = req.params.list.split('+')
+  try {
+    const cakes = await Promise.all(cakeIdList.map(async cakeId=>
+      await Cake.findOne({cakeId})
+    ))
+    res.send(cakes)
+  } catch (error) {
+    res.status(400).json({error: error.message})
+  }
+}
+
 const getCakeByCakeId = (req, res) => {
   const cakeId = req.params.cakeid
   Cake.findOne({cakeId})
@@ -96,6 +108,7 @@ const updateCakeById = (req, res) => {
 
 module.exports = {
   getAllCakes,
+  getCakesByCakeIdList,
   getAllCategories,
   getCakesByCategory,
   getCakeByCakeId,

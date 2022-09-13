@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { 
     getAllCakes,
+    getCakesByCakeIdList,
     getAllCategories,
     getCakesByCategory,
     getCakeByCakeId,
@@ -13,7 +14,9 @@ const {
 
 const requireAuth = require('../middleware/requireAuth')
 
-router.get('/sort-search-limit', getAllCakes)
+router.get('/', getAllCakes)
+
+router.get('/by-cakeid-list/:list', getCakesByCakeIdList)
 
 router.get('/by-cakeid/:cakeid', getCakeByCakeId)
 

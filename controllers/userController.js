@@ -15,7 +15,7 @@ const validateToken = (req, res) => {
             .then(user=>res.send(user))   
     } 
     catch {
-        res.status(400).json({error: 'invalid token'})
+        res.status(401).json({error: 'invalid token'})
     }
 }
 

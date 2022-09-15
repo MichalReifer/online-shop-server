@@ -20,7 +20,7 @@ const cakeSchema = new Schema({
     },
     description: {
         type: String,
-        requires: false
+        required: false
     },
     image: {
         data: Buffer,

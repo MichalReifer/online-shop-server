@@ -1,16 +1,13 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const cors = require('cors');
 
 const cakeRoutes = require('./routes/cakeRoutes')
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
-require('./editCollections/editCakes')
 require('dotenv').config()
 
 const app = express()
-app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 

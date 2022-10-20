@@ -1,5 +1,6 @@
 const Cake = require('../models/cake')
 const fs = require('fs')
+const mongoose = require('mongoose')
 
 
 const getAllCakes = (req, res) => {
@@ -51,10 +52,18 @@ const getAllCategories = (req,res)=>{
     .catch(err => res.status(400).json({error: err.message}))
 }
 
-const addNewCake = (req, res) => {
+const addNewCake = async (req, res) => {
   const authUser = req.user
   if (!authUser.admin)
     return res.status(400).json({error: 'you are not authorized to perform this action'})   
+
+  const cakeIdExists = await Cake.findOne({cakeId: req.body.cakeId})
+  if (cakeIdExists)
+    return res.status(400).json({error: 'cakeId already exists'})
+
+  // req.body.image = { data: fs.readFileSync(req.body.image), contentType: 'image/jpeg'} // when uploading from nodejs and cakeSchema.image is {data: Buffer, contentType: String}
+  // req.body.image = fs.readFileSync(req.body.image) // when uploading from nodejs and cakeSchema.image is {type: Buffer} (need to change back after uploading)
+  req.body.image = { data: Buffer.from(req.body.image, 'base64'), contentType: 'image/jpeg'} // uploading from frontend as base64 string
 
   const cake = new Cake(req.body)
   cake.save()
@@ -89,7 +98,7 @@ const deleteCakeById = (req, res) => {
     .catch(err => res.status(400).json({error: err.message}))
 }
 
-const updateCakeById = (req, res) => {
+const updateCakeById = async (req, res) => {
   const authUser = req.user
   const id = req.params.id
 
@@ -97,6 +106,14 @@ const updateCakeById = (req, res) => {
     return res.status(400).json({error: 'you are not authorized to perform this action'})   
   if (!mongoose.isValidObjectId(id))
     return res.status(404).json({error: 'cake id is invalid'})
+
+  if (req.body.cakeId) {
+    const cakeIdExists = await Cake.findOne({cakeId: req.body.cakeId})
+    if (cakeIdExists) return res.status(400).json({error: 'cakeId already exists'})
+  }
+
+  if (req.body.image)
+    req.body.image = { data: Buffer.from(req.body.image, 'base64'), contentType: 'image/jpeg'}
 
   Cake.findByIdAndUpdate(id, req.body, {new: true})
     .then(cake => {

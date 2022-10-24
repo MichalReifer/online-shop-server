@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const fileUpload = require('express-fileupload');
 
 const cakeRoutes = require('./routes/cakeRoutes')
 const userRoutes = require('./routes/userRoutes')
@@ -10,6 +11,7 @@ require('dotenv').config()
 const app = express()
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(fileUpload());
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true})
     .then(result => app.listen(process.env.PORT))

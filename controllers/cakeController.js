@@ -1,5 +1,4 @@
 const Cake = require('../models/cake')
-const fs = require('fs')
 const mongoose = require('mongoose')
 
 
@@ -61,9 +60,8 @@ const addNewCake = async (req, res) => {
   if (cakeIdExists)
     return res.status(400).json({error: 'cakeId already exists'})
 
-  // req.body.image = { data: fs.readFileSync(req.body.image), contentType: 'image/jpeg'} // when uploading from nodejs and cakeSchema.image is {data: Buffer, contentType: String}
-  // req.body.image = fs.readFileSync(req.body.image) // when uploading from nodejs and cakeSchema.image is {type: Buffer} (need to change back after uploading)
-  req.body.image = { data: Buffer.from(req.body.image, 'base64'), contentType: 'image/jpeg'} // uploading from frontend as base64 string
+  if (req.files)
+    req.body.image = { data: req.files.image?.data, contentType: 'image/jpeg'}
 
   const cake = new Cake(req.body)
   cake.save()
@@ -112,8 +110,8 @@ const updateCakeById = async (req, res) => {
     if (cakeIdExists) return res.status(400).json({error: 'cakeId already exists'})
   }
 
-  if (req.body.image)
-    req.body.image = { data: Buffer.from(req.body.image, 'base64'), contentType: 'image/jpeg'}
+  if (req.files)
+    req.body.image = { data: req.files.image?.data, contentType: 'image/jpeg'}
 
   Cake.findByIdAndUpdate(id, req.body, {new: true})
     .then(cake => {
